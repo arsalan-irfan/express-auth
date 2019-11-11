@@ -26,7 +26,6 @@ User.init(
     },
     password: {
       type: Sequelize.STRING,
-      allowNull: false
     },
     source: {
       type: Sequelize.STRING,

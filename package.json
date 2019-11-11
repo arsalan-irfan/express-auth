@@ -4,13 +4,15 @@
   "description": "auth package",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test-init": "./node_modules/jasmine/bin/jasmine.js init",
+    "test": "./node_modules/jasmine/bin/jasmine.js spec/createAccount.spec.js",
     "start": "nodemon app.js"
   },
   "author": "Arsalan",
   "license": "ISC",
   "dependencies": {
     "@hapi/joi": "^16.1.7",
+    "assert": "^2.0.0",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.19.0",
     "dotenv": "^8.2.0",
@@ -19,9 +21,17 @@
     "mysql2": "^2.0.0",
     "nodemon": "^1.19.4",
     "passport": "^0.4.0",
+    "passport-facebook": "^3.0.0",
     "passport-jwt": "^4.0.0",
     "passport-local": "^1.0.0",
+    "request": "^2.88.0",
     "sequelize": "^5.21.2",
-    "social-login": "^0.2.8"
+    "should": "^13.2.3",
+    "supertest": "^4.0.2",
+    "swagger-jsdoc": "^3.4.0",
+    "swagger-ui-express": "^4.1.2"
+  },
+  "devDependencies": {
+    "jasmine": "^3.5.0"
   }
 }

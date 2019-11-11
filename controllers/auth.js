@@ -80,7 +80,7 @@ router.post("/email/signin", function(req, res, next) {
         //console.log(user);
         const payload = {
           user: {
-            id: user._id
+            id: user.user_id
           }
         };
         const token = jwt.sign(payload, "jwt-secret", { expiresIn: 360000 });
@@ -95,19 +95,40 @@ router.get("/profile", function(req, res, next) {
     if (err) {
       res.json(err);
     }
-    //get user
-    //  if (req.isAuthenticated()) {
-    //console.log('req.file', ' ', req.file);
     if (info || !user) {
       console.log("hello", info);
       res.status(400).json({ errors: [{ msg: info.message }] });
     }
     if (user) {
+      const {password,...result}=user;
+      console.log(result)
       res.status(200).json(user);
     }
   })(req, res, next);
 });
 
-//Forgot password
+//Facebook login
 
+router.get(
+  '/login/facebook',
+  passport.authenticate('facebook', { scope: ['email'] })
+);
+
+router.get(
+  '/return',
+  passport.authenticate('facebook', { session: false }),
+  function(req, res) {
+    //  console.log(req.user.token);
+
+    const payload = {
+      user: {
+        id: req.user._id
+      }
+    };
+    const token = jwt.sign(payload, 'jwt-secret', { expiresIn: 360000 });
+    // console.log(token);
+    res.status(200).json({token:token})
+    //res.status(200).send(true);
+  }
+);
 module.exports = router;
