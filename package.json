@@ -33,5 +33,9 @@
   },
   "devDependencies": {
     "jasmine": "^3.5.0"
+  },
+  "apidoc": {
+    "title": "Users API",
+    "url": "https://localhost:5000"
   }
 }

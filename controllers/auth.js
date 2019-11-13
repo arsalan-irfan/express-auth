@@ -9,6 +9,11 @@ const schema = require("../helper/Validation");
 require("../config/passport")(passport);
 const hashPassword = require("../helper/hash");
 
+/**
+ * @api {post} /auth/email/signup Create user
+ * @apiName CreateUser
+ * @apiGroup AuthAPI
+*/
 //Register Handle
 router.post("/email/signup", async (req, res) => {
   const { firstname, lastname, email, source, password } = req.body;
@@ -63,7 +68,11 @@ router.post("/email/signup", async (req, res) => {
     res.status(400).json({ errors: [{ msg: err }] });
   }
 });
-
+/**
+ * @api {post} /auth/email/signin Sign in user
+ * @apiName SigninUser
+ * @apiGroup AuthAPI
+*/
 //Login Handle
 router.post("/email/signin", function(req, res, next) {
   passport.authenticate("local", { session: false }, function(err, user, info) {
@@ -90,6 +99,22 @@ router.post("/email/signin", function(req, res, next) {
   })(req, res, next);
 });
 
+/**
+ * @api {get} /auth/profile Request User information
+ * @apiName GetAuthUser
+ * @apiGroup AuthAPI
+ *
+ * @apiParam {Number} id Users unique ID.
+ * @apiPermission Authorized users only
+ *
+ * @apiSuccess {Number} id Unique id of the User.
+ * @apiSuccess {String} firstname Firstname of the User.
+ * @apiSuccess {String} lastname  Lastname of the User.
+ * @apiSuccess {email} email  Address of the user.
+ * @apiSuccess {date} createdAt  App creation date.
+ * @apiSuccess {date} email  last update date.
+ *
+*/
 router.get("/profile", function(req, res, next) {
   passport.authenticate("jwt", { session: false }, function(err, user, info) {
     if (err) {
