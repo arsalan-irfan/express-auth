@@ -7,8 +7,10 @@ require("dotenv").config();
 const User = require("../models/User");
 const schema = require("../helper/Validation");
 require("../config/passport")(passport);
-const hashPassword = require("../helper/hash");
+const setProfile = require("../helper/profile").setProfile
 
+
+const hashPassword = require("../helper/hash");
 /**
  * @api {post} /auth/email/signup Create user
  * @apiName CreateUser
@@ -125,9 +127,9 @@ router.get("/profile", function(req, res, next) {
       res.status(400).json({ errors: [{ msg: info.message }] });
     }
     if (user) {
-      const { password, ...result } = user;
-      console.log(result);
-      res.status(200).json(user);
+      let profile= setProfile(user);
+      console.log("Result"+profile.firstname);
+      res.status(200).json(profile);
     }
   })(req, res, next);
 });
@@ -143,7 +145,7 @@ router.get(
   "/facebook/signin/return",
   passport.authenticate("facebook", { session: false }),
   function(req, res) {
-     console.log("Req.user"+req.user);
+    console.log("Req.user" + req.user);
 
     const payload = {
       user: {
@@ -151,15 +153,37 @@ router.get(
       }
     };
     const token = jwt.sign(payload, "jwt-secret", { expiresIn: "2h" });
-    
+
     console.log(token);
     res.cookie("auth", token);
     res.redirect(`http://127.0.0.1:5500/authcheck.html`);
     //res.status(200).send(true);
   }
 );
-router.get("/facebook/logout", function(req, res) {
-  req.logout();
-  res.redirect("/");
-});
+//Google Login
+router.get(
+  "/google/signin",
+  passport.authenticate("google", { scope: ["profile", "email"] })
+);
+
+router.get(
+  "/google/signin/return",
+  passport.authenticate("google", { session: false }),
+  async (req, res) => {
+    //res.render('navbar');
+
+    const payload = {
+      user: {
+        id: req.user.user_id
+      }
+    };
+    const token = await jwt.sign(payload, "jwt-secret", { expiresIn: "2h" });
+    console.log(token);
+    res.cookie("auth", token);
+    res.redirect("http://127.0.0.1:5500/authcheck.html");
+    //res.status(200).send(true);
+    // res.send(req.user);
+  }
+);
+
 module.exports = router;

@@ -3,6 +3,7 @@ const bcrypt = require("bcryptjs");
 const passportJWT = require("passport-jwt");
 const FacebookStrategy = require("passport-facebook").Strategy;
 // const FacebookTokenStrategy = require("passport-facebook-token")
+GoogleStrategy = require('passport-google-oauth20').Strategy;
 const ExtractJWT = passportJWT.ExtractJwt;
 const JWTStrategy = passportJWT.Strategy;
 const dotenv = require("dotenv");
@@ -51,15 +52,7 @@ module.exports = function(passport) {
               message: "invalid username or password"
             });
           }
-          //Match password
-          // if(password===user.password){
-          //     return done(null, user);
-
-          // } else {
-          //   return done(null, false, {
-          //     message: 'invalid username or password'
-          //   });
-          // }
+          //Match Password
           bcrypt.compare(password, user.password, (err, isMatch) => {
             if (err) throw err;
 
@@ -113,39 +106,41 @@ module.exports = function(passport) {
       }
     )
   );
-  // passport.use(
-  //   "facebookToken",
-  //   new FacebookTokenStrategy(
-  //     {
-  //       clientID: process.env.FACEBOOK_CLIENT_ID,
-  //       clientSecret: process.env.FACEBOOK_CLIENT_SECRET,
-
-  //     },
-  //     async (accessToken, refreshToken, profile, cb) => {
-  //       try {
-  //         const {
-  //           name: { givenName, familyName },
-  //           emails
-  //         } = profile;
-  //         const email = emails[0].value;
-  //         const user = await User.findOne({ where: { email: email } });
-  //         if (user) {
-  //           return cb(null, user);
-  //         }
-
-  //         let newUser = await User.create({
-  //           firstName: givenName,
-  //           lastName: familyName,
-  //           email: email,
-  //           source: "facebook",
-  //           password: "."
-  //         });
-
-  //         cb(null, newUser);
-  //       } catch (err) {
-  //         cb(err, false, err.message);
-  //       }
-  //     }
-  //   )
-  // );
+  passport.use(
+    new GoogleStrategy(
+      {
+        clientID: process.env.GOOGLE_CLIENT_ID,
+        clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+        callbackURL: 'http://localhost:5000/auth/google/signin/return',
+        profileFields: ['emails', 'name', 'photos']
+      },
+      function(accessToken, refreshToken, profile, done) {
+        const GoogleEmail = profile.emails[0].value;
+        console.log(profile);
+        User.findOne({ where: { email: GoogleEmail } }).then(user => {
+          if (user) {
+            return done(null,user);
+          } else {
+            const { givenName, familyName } = profile.name;
+            User.create({
+              firstname: givenName,
+              lastname: familyName,
+              email: GoogleEmail,
+              source: "google",
+              //password: "google"
+            })
+              .then(newUser => {
+                console.log("user successfully created");
+                return done(null, newUser);
+              })
+              .catch(err => {
+                console.log("user not save ");
+                return done(err);
+              });
+          }
+        });
+      }
+    )
+  );
+  
 };
