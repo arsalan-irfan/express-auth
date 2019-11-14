@@ -5,8 +5,10 @@ const bodyParser = require("body-parser");
 const dotenv = require('dotenv');
 const methodOverride = require('method-override');
 const port = 5000;
+const cors=require('cors');
 app.use(bodyParser.json({ type: "application/json" }));
 dotenv.config();
+app.use(cors());
 const endpoints=require('./routes/endpoints');
 var userAPI = require('./routes/endpoints');
 //apidoc -f "controllers/.*\\.js$" -i ./  -o apidoc/

@@ -136,11 +136,20 @@ router.get("/profile", function(req, res, next) {
 
 //Facebook login
 
+/**
+ * @api {get} /auth/facebook/signin Facebook Signin
+ * @apiName FacebookSignin
+ * @apiGroup AuthAPI
+ */
 router.get(
   "/facebook/signin",
   passport.authenticate("facebook", { scope: ["email"] })
 );
-
+/**
+ * @api {get} /auth/facebook/signin/return Facebook Signin return
+ * @apiName FacebookSignin
+ * @apiGroup AuthAPI
+ */
 router.get(
   "/facebook/signin/return",
   passport.authenticate("facebook", { session: false }),
@@ -161,10 +170,22 @@ router.get(
   }
 );
 //Google Login
+/**
+ * @api {get} /auth/google/signin Google Signin
+ * @apiName GoogleSignin
+ * @apiGroup AuthAPI
+ */
+
 router.get(
   "/google/signin",
   passport.authenticate("google", { scope: ["profile", "email"] })
 );
+
+/**
+ * @api {get} /auth/google/signin/return Google Signin
+ * @apiName GoogleSignin
+ * @apiGroup AuthAPI
+ */
 
 router.get(
   "/google/signin/return",
@@ -179,10 +200,9 @@ router.get(
     };
     const token = await jwt.sign(payload, "jwt-secret", { expiresIn: "2h" });
     console.log(token);
-    res.cookie("auth", token);
-    res.redirect("http://127.0.0.1:5500/authcheck.html");
-    //res.status(200).send(true);
-    // res.send(req.user);
+    res.cookie("auth", token).redirect("http://127.0.0.1:5500/authcheck.html");
+    //console.log("In request "+req.cookies.auth)
+
   }
 );
 

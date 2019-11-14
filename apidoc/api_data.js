@@ -11,6 +11,26 @@ define({ "api": [
   },
   {
     "type": "get",
+    "url": "/auth/facebook/signin",
+    "title": "Facebook Signin",
+    "name": "FacebookSignin",
+    "group": "AuthAPI",
+    "version": "0.0.0",
+    "filename": "./controllers/auth.js",
+    "groupTitle": "AuthAPI"
+  },
+  {
+    "type": "get",
+    "url": "/auth/facebook/signin/return",
+    "title": "Facebook Signin return",
+    "name": "FacebookSignin",
+    "group": "AuthAPI",
+    "version": "0.0.0",
+    "filename": "./controllers/auth.js",
+    "groupTitle": "AuthAPI"
+  },
+  {
+    "type": "get",
     "url": "/auth/profile",
     "title": "Request User information",
     "name": "GetAuthUser",
@@ -74,6 +94,26 @@ define({ "api": [
         ]
       }
     },
+    "version": "0.0.0",
+    "filename": "./controllers/auth.js",
+    "groupTitle": "AuthAPI"
+  },
+  {
+    "type": "get",
+    "url": "/auth/google/signin",
+    "title": "Google Signin",
+    "name": "GoogleSignin",
+    "group": "AuthAPI",
+    "version": "0.0.0",
+    "filename": "./controllers/auth.js",
+    "groupTitle": "AuthAPI"
+  },
+  {
+    "type": "get",
+    "url": "/auth/google/signin/return",
+    "title": "Google Signin",
+    "name": "GoogleSignin",
+    "group": "AuthAPI",
     "version": "0.0.0",
     "filename": "./controllers/auth.js",
     "groupTitle": "AuthAPI"
