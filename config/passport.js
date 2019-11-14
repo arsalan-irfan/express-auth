@@ -2,9 +2,10 @@ const LocalStrategy = require("passport-local").Strategy;
 const bcrypt = require("bcryptjs");
 const passportJWT = require("passport-jwt");
 const FacebookStrategy = require("passport-facebook").Strategy;
+// const FacebookTokenStrategy = require("passport-facebook-token")
 const ExtractJWT = passportJWT.ExtractJwt;
 const JWTStrategy = passportJWT.Strategy;
-const dotenv = require('dotenv');
+const dotenv = require("dotenv");
 dotenv.config();
 //User model
 const User = require("../models/User");
@@ -16,6 +17,7 @@ module.exports = function(passport) {
         secretOrKey: "jwt-secret"
       },
       function(jwtPayload, cb) {
+        console.log("JWt Payload"+jwtPayload);
         return User.findOne({
           where: { user_id: jwtPayload.user.id }
           //attributes: ['id', ['name', 'title']]
@@ -78,38 +80,72 @@ module.exports = function(passport) {
       {
         clientID: process.env.FACEBOOK_CLIENT_ID,
         clientSecret: process.env.FACEBOOK_CLIENT_SECRET,
-        callbackURL: "http://localhost:5000/return",
-        profileFields: ["emails", "name", "photos"]
+        callbackURL: "http://localhost:5000/auth/facebook/signin/return",
+        profileFields: ["emails", "name", "photos"],
+        enableProof: true
       },
-      function(accessToken, refreshToken, profile, done) {
+      function async(accessToken, refreshToken, profile, done) {
         const FacebookEmail = profile.emails[0].value;
         const FacebookPhoto = profile.photos[0].value;
-        User.findOne({ email: FacebookEmail }, (err, user) => {
-          //console.log(profile);
-          if (err) {
-            return done(err);
-          }
+        console.log(profile);
+        User.findOne({ where: { email: FacebookEmail } }).then(user => {
           if (user) {
-            return done(null, user);
+            return done(null,user);
+          } else {
+            const { givenName, familyName } = profile.name;
+            User.create({
+              firstname: givenName,
+              lastname: familyName,
+              email: FacebookEmail,
+              source: "facebook",
+              password: "facebook"
+            })
+              .then(newUser => {
+                console.log("user successfully created");
+                return done(null, newUser);
+              })
+              .catch(err => {
+                console.log("user not save ");
+                return done(err);
+              });
           }
-          var newUser = new User({
-            firstname: profile.name.givenName,
-            email: FacebookEmail,
-            source:"facebook"
-          });
-          // newUser.facebook.id = profile.id;
-          // newUser.facebook.token = accessToken;
-          // newUser.facebook.name =
-          //   profile.name.givenName + ' ' + profile.name.familyName;
-          // newUser.facebook.email = profile.emails[0].value;
-
-          newUser.save(function(err) {
-            if (err) throw err;
-            // newUser.token = accessToken;
-            return done(null, newUser);
-          });
         });
       }
     )
   );
+  // passport.use(
+  //   "facebookToken",
+  //   new FacebookTokenStrategy(
+  //     {
+  //       clientID: process.env.FACEBOOK_CLIENT_ID,
+  //       clientSecret: process.env.FACEBOOK_CLIENT_SECRET,
+
+  //     },
+  //     async (accessToken, refreshToken, profile, cb) => {
+  //       try {
+  //         const {
+  //           name: { givenName, familyName },
+  //           emails
+  //         } = profile;
+  //         const email = emails[0].value;
+  //         const user = await User.findOne({ where: { email: email } });
+  //         if (user) {
+  //           return cb(null, user);
+  //         }
+
+  //         let newUser = await User.create({
+  //           firstName: givenName,
+  //           lastName: familyName,
+  //           email: email,
+  //           source: "facebook",
+  //           password: "."
+  //         });
+
+  //         cb(null, newUser);
+  //       } catch (err) {
+  //         cb(err, false, err.message);
+  //       }
+  //     }
+  //   )
+  // );
 };

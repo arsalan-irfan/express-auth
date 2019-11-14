@@ -1,0 +1,20 @@
+{
+    "name": "apidoc-example",
+    "version": "0.3.0",
+    "description": "apiDoc example project",
+    "title": "Custom apiDoc browser title",
+    "url" : "http://localhost5000",
+    "header": {
+      "title": "My own header title"
+    },
+    "footer": {
+      "title": "My own footer title"
+    },
+    "order": [
+      "AuthUser"
+    ],
+    "template": {
+        "withCompare": true,
+        "withGenerator": true
+    }
+  }

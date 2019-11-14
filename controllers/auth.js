@@ -13,7 +13,7 @@ const hashPassword = require("../helper/hash");
  * @api {post} /auth/email/signup Create user
  * @apiName CreateUser
  * @apiGroup AuthAPI
-*/
+ */
 //Register Handle
 router.post("/email/signup", async (req, res) => {
   const { firstname, lastname, email, source, password } = req.body;
@@ -72,7 +72,7 @@ router.post("/email/signup", async (req, res) => {
  * @api {post} /auth/email/signin Sign in user
  * @apiName SigninUser
  * @apiGroup AuthAPI
-*/
+ */
 //Login Handle
 router.post("/email/signin", function(req, res, next) {
   passport.authenticate("local", { session: false }, function(err, user, info) {
@@ -114,7 +114,7 @@ router.post("/email/signin", function(req, res, next) {
  * @apiSuccess {date} createdAt  App creation date.
  * @apiSuccess {date} email  last update date.
  *
-*/
+ */
 router.get("/profile", function(req, res, next) {
   passport.authenticate("jwt", { session: false }, function(err, user, info) {
     if (err) {
@@ -125,8 +125,8 @@ router.get("/profile", function(req, res, next) {
       res.status(400).json({ errors: [{ msg: info.message }] });
     }
     if (user) {
-      const {password,...result}=user;
-      console.log(result)
+      const { password, ...result } = user;
+      console.log(result);
       res.status(200).json(user);
     }
   })(req, res, next);
@@ -135,25 +135,31 @@ router.get("/profile", function(req, res, next) {
 //Facebook login
 
 router.get(
-  '/login/facebook',
-  passport.authenticate('facebook', { scope: ['email'] })
+  "/facebook/signin",
+  passport.authenticate("facebook", { scope: ["email"] })
 );
 
 router.get(
-  '/return',
-  passport.authenticate('facebook', { session: false }),
+  "/facebook/signin/return",
+  passport.authenticate("facebook", { session: false }),
   function(req, res) {
-    //  console.log(req.user.token);
+     console.log("Req.user"+req.user);
 
     const payload = {
       user: {
-        id: req.user._id
+        id: req.user.user_id
       }
     };
-    const token = jwt.sign(payload, 'jwt-secret', { expiresIn: 360000 });
-    // console.log(token);
-    res.status(200).json({token:token})
+    const token = jwt.sign(payload, "jwt-secret", { expiresIn: "2h" });
+    
+    console.log(token);
+    res.cookie("auth", token);
+    res.redirect(`http://127.0.0.1:5500/authcheck.html`);
     //res.status(200).send(true);
   }
 );
+router.get("/facebook/logout", function(req, res) {
+  req.logout();
+  res.redirect("/");
+});
 module.exports = router;
